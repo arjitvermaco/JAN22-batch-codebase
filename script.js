@@ -88,15 +88,29 @@ const createUsernames = function (accs) {
 };
 createUsernames(accounts);
 
+const updateUi = function (acc) {
+  calcDisplayBalance(acc);
+  displayMovements(acc.movements);
+  calcSummary(acc);
+};
+
+
+
 const calcDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
   labelBalance.textContent = `${acc.balance}`;
 };
 
-const displayMovements = function (movements) {
+const displayMovements = function (movements,sort =false) {
   containerMovements.innerHTML = '';
 
-  movements.forEach((mov, i) => {
+  console.log("Value of sorted in display movements", sort)
+
+  const movs = sort? movements.slice().sort((a,b)=>a-b):movements;
+
+  console.log("Value of movs ", movs)
+
+  movs.forEach((mov, i) => {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     console.log(type);
 
@@ -111,18 +125,37 @@ const displayMovements = function (movements) {
   });
 };
 
-const calcSummary = function(acc){
+const calcSummary = function (acc) {
   const moneyIn = acc.movements
-  .filter(mov => mov > 0)
-  .reduce((acc,mov)=>acc+mov,0)
-  labelSumIn.textContent = moneyIn
-
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = moneyIn;
 
   const moneyOut = acc.movements
-  .filter(mov => mov < 0)
-  .reduce((acc,mov)=>acc+mov,0)
-  labelSumOut.textContent = `${Math.abs(moneyOut)}`
-}
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = `${Math.abs(moneyOut)}`;
+};
+
+
+const showToast = function (text, type) {
+  Toastify({
+    text: text,
+    duration: 3000,
+    destination: 'https://github.com/apvarun/toastify-js',
+    newWindow: true,
+    close: true,
+    gravity: 'top', // `top` or `bottom`
+    position: 'center', // `left`, `center` or `right`
+    stopOnFocus: true, // Prevents dismissing of toast on hover
+    style: {
+      background: `${type === 'success' ? 'green' : 'red'}`,
+      color: 'white',
+    },
+    onClick: function () {}, // Callback after click
+  }).showToast();
+};
+
 
 let currentAccount;
 // Login Event Handler
@@ -133,16 +166,68 @@ btnLogin.addEventListener('click', function (e) {
   console.log(enteredPassword, enteredUsername);
   currentAccount = accounts.find(acc => acc.username === enteredUsername);
   if (currentAccount?.pin === Number(enteredPassword)) {
-    console.log('Login Success');
+    showToast("Login Successful","success")
     labelWelcome.textContent = `Welcome back , ${
       currentAccount.owner.split(' ')[0]
     }`;
     inputLoginUsername.value = inputLoginPin.value = '';
-    calcDisplayBalance(currentAccount);
-    displayMovements(currentAccount.movements);
-    calcSummary(currentAccount)
+    updateUi(currentAccount);
     containerApp.style.opacity = 100;
   } else {
-    console.log('Error Login');
+    showToast("Invalid Credentials","error")
+
   }
+
+  inputLoginPin.blur()
 });
+
+//Request Loan Feature
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+  // console.log(currentAccount)
+  if (amount > 0 && amount <= currentAccount.balance * 0.1) {
+    currentAccount.movements.push(amount);
+    console.log(currentAccount);
+    showToast(`Loan Approved for ${amount}`,"success")
+    updateUi(currentAccount);
+  } else {
+    showToast("Amount should be less than 10% of balance","error")
+     }
+  inputLoanAmount.value = '';
+});
+
+//Transfer Amount Feature
+
+btnTransfer.addEventListener('click',function(e){
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receivingAcc = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  )
+
+  if(amount >0 && 
+    receivingAcc && 
+    currentAccount.balance >= amount &&
+    receivingAcc?.username !== currentAccount.username){
+      currentAccount.movements.push(-amount);
+      receivingAcc.movements.push(amount);
+      updateUi(currentAccount)
+      showToast("Sent Successfully","success")
+
+    }
+    else{
+      showToast("Unable to send","error")
+    }
+    inputTransferAmount.value = inputTransferTo.value = '';
+
+})
+
+let sorted = false;
+
+btnSort.addEventListener('click',function(e){
+  e.preventDefault();
+  sorted = !sorted;
+  console.log(sorted)
+  displayMovements(currentAccount.movements , sorted)
+})
