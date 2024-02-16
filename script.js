@@ -1,233 +1,160 @@
-'use strict';
+//Numbers
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// BANKIST APP
+//Coversion
+console.log(Number('56'))
+console.log(Number('arjit'))
+console.log(+'23')
 
-// Data
-const account1 = {
-  owner: 'Jonas Smith',
-  movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
-  interestRate: 1.2, // %
-  pin: 1111,
-};
+//Parsing
+console.log(parseInt('30px'))
+console.log(parseInt('e23'))
+console.log(parseInt('   2.5rem   '))
+console.log(parseFloat('   2.5rem   '))
 
-const account2 = {
-  owner: 'Jessica Davis',
-  movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
-  interestRate: 1.5,
-  pin: 2222,
-};
+//Check if a value is NaN
+console.log(isNaN(20))
+console.log(isNaN('20'))
+console.log(isNaN(+'20X'))
+console.log(isNaN(23/0))
 
-const account3 = {
-  owner: 'Steven Thomas Williams',
-  movements: [200, -200, 340, -300, -20, 50, 400, -460],
-  interestRate: 0.7,
-  pin: 3333,
-};
+//Check if a value is a number
 
-const account4 = {
-  owner: 'Sarah Smith',
-  movements: [430, 1000, 700, 50, 90],
-  interestRate: 1,
-  pin: 4444,
-};
+console.log(isFinite(20))
+console.log(isFinite('20'))
+console.log(isFinite(+'20X'))
+console.log(isFinite(23/0))
 
-const accounts = [account1, account2, account3, account4];
 
-// Elements
-const labelWelcome = document.querySelector('.welcome');
-const labelDate = document.querySelector('.date');
-const labelBalance = document.querySelector('.balance__value');
-const labelSumIn = document.querySelector('.summary__value--in');
-const labelSumOut = document.querySelector('.summary__value--out');
-const labelSumInterest = document.querySelector('.summary__value--interest');
-const labelTimer = document.querySelector('.timer');
-
-const containerApp = document.querySelector('.app');
-const containerMovements = document.querySelector('.movements');
-
-const btnLogin = document.querySelector('.login__btn');
-const btnTransfer = document.querySelector('.form__btn--transfer');
-const btnLoan = document.querySelector('.form__btn--loan');
-const btnClose = document.querySelector('.form__btn--close');
-const btnSort = document.querySelector('.btn--sort');
-
-const inputLoginUsername = document.querySelector('.login__input--user');
-const inputLoginPin = document.querySelector('.login__input--pin');
-const inputTransferTo = document.querySelector('.form__input--to');
-const inputTransferAmount = document.querySelector('.form__input--amount');
-const inputLoanAmount = document.querySelector('.form__input--loan-amount');
-const inputCloseUsername = document.querySelector('.form__input--user');
-const inputClosePin = document.querySelector('.form__input--pin');
-
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
-
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-  ['INR', 'Indian rupee'],
-]);
-
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-/////////////////////////////////////////////////
-//Create function to seperate initials from accounts
-
-const createUsernames = function (accs) {
-  accs.forEach(function (acc) {
-    acc.username = acc.owner
-      .toLowerCase()
-      .split(' ')
-      .map(name => name[0])
-      .join('');
-  });
-};
-createUsernames(accounts);
-
-const updateUi = function (acc) {
-  calcDisplayBalance(acc);
-  displayMovements(acc.movements);
-  calcSummary(acc);
-};
+console.log(Number.isInteger(20))
+console.log(Number.isInteger('20'))
+console.log(Number.isInteger(+'20X'))
+console.log(Number.isInteger(23/0))
 
 
 
-const calcDisplayBalance = function (acc) {
-  acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${acc.balance}`;
-};
+//Maths and Rounding
+console.log(Math.sqrt(25))
 
-const displayMovements = function (movements,sort =false) {
-  containerMovements.innerHTML = '';
-
-  console.log("Value of sorted in display movements", sort)
-
-  const movs = sort? movements.slice().sort((a,b)=>a-b):movements;
-
-  console.log("Value of movs ", movs)
-
-  movs.forEach((mov, i) => {
-    const type = mov > 0 ? 'deposit' : 'withdrawal';
-    console.log(type);
-
-    const html = `<div class="movements__row">
-    <div class="movements__type movements__type--${type}">
-      ${i + 1} ${type}
-    </div>
-
-    <div class="movements__value">${mov}</div>
-  </div>`;
-    containerMovements.insertAdjacentHTML('afterbegin', html);
-  });
-};
-
-const calcSummary = function (acc) {
-  const moneyIn = acc.movements
-    .filter(mov => mov > 0)
-    .reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = moneyIn;
-
-  const moneyOut = acc.movements
-    .filter(mov => mov < 0)
-    .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = `${Math.abs(moneyOut)}`;
-};
+console.log(Math.min(5,123,32,53,1,45))
+console.log(Math.max(5,123,32,53,1,45))
+console.log(Math.max(5,123,'32px',53,1,45))
 
 
-const showToast = function (text, type) {
-  Toastify({
-    text: text,
-    duration: 3000,
-    destination: 'https://github.com/apvarun/toastify-js',
-    newWindow: true,
-    close: true,
-    gravity: 'top', // `top` or `bottom`
-    position: 'center', // `left`, `center` or `right`
-    stopOnFocus: true, // Prevents dismissing of toast on hover
-    style: {
-      background: `${type === 'success' ? 'green' : 'red'}`,
-      color: 'white',
-    },
-    onClick: function () {}, // Callback after click
-  }).showToast();
-};
+console.log(Math.PI)
+
+//Find the area of the circle in DOm and 
+// append the answer in DOM 
+const circle = document.querySelector('.circle')
+const style = getComputedStyle(circle)
+console.log(style.getPropertyValue('height'))
+const circleRadius = parseInt(style.getPropertyValue('width'))/2;
+console.log("Circle Radius", circleRadius)
+
+const area = Math.PI * (circleRadius **2);
+console.log(area)
+let html = `<p>Area of circle: ${parseInt(area)}</p>`
+circle.insertAdjacentHTML("afterend",html)
+
+console.log(Math.random())
+// between 0 and 1 
+
+const randomInt = (min,max) => (Math.random() * (max-min) +1) + min
+
+console.log(Math.floor(randomInt(10,20)))
+
+//Rounding Int
+
+console.log(Math.round(23.3))
+console.log(Math.round(23.9))
+console.log(Math.ceil(23.1))
+console.log(Math.ceil(23.9))
+console.log(Math.floor(23.1))
+console.log(Math.floor(23.9))
+console.log(Math.trunc(23.3));
+console.log(Math.trunc(-23.3));
+console.log(Math.floor(-23.3));
+console.log(Math.ceil(-23.3));
+
+//Remainder Operator
+console.log(5%2)
+console.log(10%2)
+
+console.log(8/3)
+
+const diameter = 232_343_434_23;
+console.log(diameter)
+
+//BigInt
+
+// console.log(2**53-1)
+// console.log(Number.MAX_SAFE_INTEGER);
+// console.log(2**53+1)
+// console.log(2**53+2)
+// console.log(2**53+3)
+// console.log(2**53+4)
+// console.log(2**53+10
+const bigNum = 20289830237283728378237n;
+const num = 23
+console.log(bigNum * BigInt(num))
+console.log(typeof(466666095457525752699451n))
+
+console.log(20n > 15)
+console.log(20n === 20)
+console.log(20n == '20')
+
+//Creating Dates
+
+const now = new Date();
+console.log(now)
+
+console.log(new Date('Aug 02 2020 18:20:10'))
+console.log(new Date('Decenber 24 , 2015'))
+console.log(new Date('2020-04-01T10:17:24.185Z'))
+
+console.log(new Date(2037, 10, 19, 15, 23, 5));
+console.log(new Date(2037, 1, 1));
+
+//JAn 01 : 1970
+
+console.log(new Date(2037,0,0));
+
+const futureDate = new Date(2026,10,8,15,30)
+const pastDate = new Date(1970,0,1,0,0,0)
+console.log(futureDate)
+console.log(futureDate.getFullYear())
+console.log(futureDate.getMonth())
+console.log(futureDate.getDate())
+console.log(futureDate.getDay())
+console.log(futureDate.getHours())
+console.log(futureDate.getMinutes())
+console.log(futureDate.getSeconds())
+console.log(futureDate.toISOString())
+console.log(futureDate.getTime())
+console.log(pastDate)
+console.log(pastDate.getTime())
 
 
-let currentAccount;
-// Login Event Handler
-btnLogin.addEventListener('click', function (e) {
-  e.preventDefault();
-  const enteredUsername = inputLoginUsername.value;
-  const enteredPassword = inputLoginPin.value;
-  console.log(enteredPassword, enteredUsername);
-  currentAccount = accounts.find(acc => acc.username === enteredUsername);
-  if (currentAccount?.pin === Number(enteredPassword)) {
-    showToast("Login Successful","success")
-    labelWelcome.textContent = `Welcome back , ${
-      currentAccount.owner.split(' ')[0]
-    }`;
-    inputLoginUsername.value = inputLoginPin.value = '';
-    updateUi(currentAccount);
-    containerApp.style.opacity = 100;
-  } else {
-    showToast("Invalid Credentials","error")
+futureDate.setFullYear(2040)
+console.log(futureDate)
 
-  }
 
-  inputLoginPin.blur()
-});
+//Internationalizing Number(Intl)
+const cost = 34323423.32
 
-//Request Loan Feature
-btnLoan.addEventListener('click', function (e) {
-  e.preventDefault();
-  const amount = Number(inputLoanAmount.value);
-  // console.log(currentAccount)
-  if (amount > 0 && amount <= currentAccount.balance * 0.1) {
-    currentAccount.movements.push(amount);
-    console.log(currentAccount);
-    showToast(`Loan Approved for ${amount}`,"success")
-    updateUi(currentAccount);
-  } else {
-    showToast("Amount should be less than 10% of balance","error")
-     }
-  inputLoanAmount.value = '';
-});
+const options = {
+    style:'currency',
+    currency:'INR'
+}
 
-//Transfer Amount Feature
+// console.log('US', new Intl.NumberFormat('en-US',options).format(cost))
+console.log('INDIA', new Intl.NumberFormat(navigator.language,options).format(cost))
 
-btnTransfer.addEventListener('click',function(e){
-  e.preventDefault();
-  const amount = Number(inputTransferAmount.value);
-  const receivingAcc = accounts.find(
-    acc => acc.username === inputTransferTo.value
-  )
+console.log(navigator.language)
 
-  if(amount >0 && 
-    receivingAcc && 
-    currentAccount.balance >= amount &&
-    receivingAcc?.username !== currentAccount.username){
-      currentAccount.movements.push(-amount);
-      receivingAcc.movements.push(amount);
-      updateUi(currentAccount)
-      showToast("Sent Successfully","success")
 
-    }
-    else{
-      showToast("Unable to send","error")
-    }
-    inputTransferAmount.value = inputTransferTo.value = '';
 
-})
 
-let sorted = false;
 
-btnSort.addEventListener('click',function(e){
-  e.preventDefault();
-  sorted = !sorted;
-  console.log(sorted)
-  displayMovements(currentAccount.movements , sorted)
-})
+
+
+
