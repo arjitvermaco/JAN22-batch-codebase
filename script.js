@@ -182,11 +182,10 @@ const whereAmI = function () {
       if (!res.ok) throw new Error('Problem with geolocation api!!');
       return res.json();
     })
-    .then(data=>{
+    .then(data => {
       // console.log(data)
-      const userCountry = data.country.slice(0,2).toLowerCase();
-      return fetch(`https://restcountries.com/v3.1/alpha/${userCountry}`)
-
+      const userCountry = data.country.slice(0, 2).toLowerCase();
+      return fetch(`https://restcountries.com/v3.1/alpha/${userCountry}`);
 
       //Make country api call
     })
@@ -194,14 +193,90 @@ const whereAmI = function () {
       if (!res.ok) throw new Error('Problem with Country api!!');
       return res.json();
     })
-    .then(data=>{
+    .then(data => {
       console.log(data[0]);
-      renderData(data[0])
+      renderData(data[0]);
     })
-    .catch(err => console.error("error with geolocation",err))
-    .finally(()=>{
+    .catch(err => console.error('error with geolocation', err))
+    .finally(() => {
       countriesContainer.style.opacity = 1;
-      loader.style.opacity = 0
+      loader.style.opacity = 0;
     });
+};
+whereAmI();
+
+const getJsonData = function (url, errorMsg = 'Something when wrong') {
+  return fetch(url).then(res => {
+    if (!res.ok) throw new Error(`${errorMsg} (${res.status})`);
+    return res.json();
+  });
+};
+
+//  async function getData(){
+//     const response = await fetch('https://restcountries.com/v3.1/alpha/in');
+//     console.log(response)
+//     console.log("After fetch!!!")
+//     const data = await response.json()
+//     console.log(data)
+// }
+
+// getData()
+
+// function getSyncData(){
+//   const res =  fetch('https://restcountries.com/v3.1/alpha/in');
+//   console.log(res)
+//   console.log("Under Fetch!!")
+// }
+
+// async function getCountry(){
+//   const countryData = await getJsonData('https://restcountries.com/v3.1/alpha/in');
+//   console.log(countryData)
+// }
+
+function getCountry() {
+  const countryData = getJsonData('https://restcountries.com/v3.1/alpha/in');
+  console.log(countryData);
+}
+getCountry();
+
+// getSyncData()
+
+const imgContainer = document.querySelector('.images');
+
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const img = document.createElement('img');
+    // <img></img>
+    img.src = imgPath;
+    // <img src="imgPath"/>
+
+
+    img.addEventListener('load', function () {
+      imgContainer.append(img);
+      resolve(img);
+    });
+
+    img.addEventListener('error', function () {
+      reject(new Error('Image not found!!'));
+    });
+  });
+};
+
+
+// createImage('images/img-1').then(img => {
+//   console.log(img);
+//   return createImage('images/img-2.jpg')
+// }).then(img=>{
+//   console.log(img)
+// }).catch(err=>console.error(err))
+
+async function loadImage(){
+  try{
+    let img = await createImage('images/img-1.jpg')
+    console.log(img)
+  }catch(err){
+    console.error(err)
   }
-whereAmI()
+}
+
+loadImage()
