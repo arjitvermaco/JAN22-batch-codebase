@@ -1,101 +1,162 @@
 'use strict';
 
-// const private = 'some'
+// prettier-ignore
 
-// const Person = function(firstName,birthYear){
-//   this.firstName = firstName;
-//   this.birthYear = birthYear
+const form = document.querySelector('.form');
+const containerWorkouts = document.querySelector('.workouts');
+const inputType = document.querySelector('.form__input--type');
+const inputDistance = document.querySelector('.form__input--distance');
+const inputDuration = document.querySelector('.form__input--duration');
+const inputCadence = document.querySelector('.form__input--cadence');
+const inputElevation = document.querySelector('.form__input--elevation');
 
-// }
+class Workout{
+  date = new Date();
+  id = (Date.now() + '').slice(-10);
 
-// const arjit = new Person("Arjit",1991)
-// console.log(arjit)
-
-// // 1. New {} is created
-// // 2. function is called, this = {}
-// // 3. {} linked to prototype
-// // 4. function automatically return {}
-
-// const adarsh = new Person("Adarsh", 1996)
-// const rahul = new Person("Rahul", 1997)
-// const rishabh = "Rishabh"
-
-// console.log(rahul instanceof Person)
-// console.log(rishabh instanceof Person)
-
-
-// Person.hey = function(){
-//   console.log("Hey 👋")
-//   console.log(this)
-// }
-
-// Person.hey()
-
-// // console.log(arjit.hey())
-
-// //Prototypes
-
-
-// // const myArr = new Array()
-
-
-// Person.prototype.calcAge = function(){
-//   console.log(2024-this.birthYear)
-// }
-
-
-// console.log(Person.prototype)
-
-// arjit.calcAge()
-// rahul.calcAge()
-
-// console.log(arjit.__proto__)
-// console.log(arjit.__proto__ === Person.prototype);
-// console.log(arjit.prototype)
-
-// Person.prototype.species = "Home Sapiens"
-
-// console.log(arjit.species)
-
-// const myArr = [23,34,534,23,55,2,232] //new Array
-
-// console.log(myArr.__proto__ === Array.prototype)
-
-// console.log(myArr.__proto__)
-// console.log(myArr.__proto__.__proto__)
-
-
-class PersonCl{
-  constructor(fullName,birthYear){
-    this.fullName = fullName
-    this.birthYear = birthYear
-  }
-  calcAge(){
-    console.log(2024 - this.birthYear)
-  }
-  greet(){
-    console.log(`Hey!! ${this.fullName}`)
+  constructor(coords,distance,duration){
+    this.coords = coords;
+    this.distance = distance;
+    this.duration = duration;
   }
 
-  get age(){
-    return 2024 - this.birthYear
+  _setDescription(){
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
+      months[this.date.getMonth()]
+    } ${this.date.getDate()}`;
+  }
+}
+
+
+class Running extends Workout{
+  type = 'running'
+  constructor(coords,distance,duration,cadence){
+    super(coords,distance,duration);
+    this.cadence = cadence;
+    this.calcPace();
+    this._setDescription()
   }
 
-  set fullName(name){
-    if(name.includes(' ')) this._fullName = name;
-    else alert(`${name} is not a full name!`)
+  calcPace(){
+    this.pace = this.distance / this.duration;
+    return this.pace
+  }
+}
+
+class Cycling extends Workout{
+  type = 'cycling'
+  constructor(coords,distance,duration,elevationGain){
+    super(coords,distance,duration);
+    this.elevationGain = elevationGain;
+    this.calcSpeed()
+    this._setDescription()
   }
 
-  get fullName(){
-    return this._fullName
+  calcSpeed(){
+    
+    this.speed = this.distance / (this.duration/60)
+    return this.speed
+  }
+}
+
+// const run1 = new Running([39, -12], 5.2, 24, 178);
+// const cycling1 = new Cycling([39, -12], 27, 95, 523);
+
+// console.log(run1)
+// console.log(cycling1)
+
+
+class App {
+  #map;
+  #mapZoomLevel = 15;
+  #mapEvent;
+  #workouts = [];
+
+  constructor() {
+    //get user position
+
+    this._getPosition();
+
+    form.addEventListener('submit',this._newWorkout)
+    inputType.addEventListener('change',this._toggleElevationField)
+  }
+
+
+  _toggleElevationField(){
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden')
+    inputCadence.closest('.form__row').classList.toggle('form__row--hidden')
+  
+  }
+
+  _getPosition() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          this._loadMap(position);
+        },
+        () => {
+          alert('Cannot Load your position!!');
+        }
+      );
+    }
+  }
+
+  _loadMap(position) {
+    const { latitude, longitude } = position.coords;
+    const coords = [latitude, longitude];
+    console.log(coords);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(this.#map);
+
+    this.#map.on('click',this._showForm.bind(this))
+  }
+
+  _showForm(mapE){
+    console.log("Map was clicked") ;
+    console.log(mapE);
+    this.#mapEvent = mapE;
+    form.classList.remove('hidden')
+    inputDistance.focus()
+  }
+
+  _newWorkout(event){
+    event.preventDefault()
+    console.log("New workout envoked!!!");
+
+    const type = inputType.value;
+    const distance = Number(inputDistance.value);
+    const duration = +inputDuration.value
+    const {lat,lng} = this.#mapEvent.latlng
+    //if workout is cycling crate a cycling obj
+    if(type === 'cycling'){
+      const elevation = +inputElevation.value;
+
+      // Create a new Cycling object from cycling class
+      workout = new Cycling([lat,lng] , distance, duration,elevation)
+    }
+
+    if(type === 'running'){
+      const cadence = +inputCadence.value;
+
+      // Create a new Running object from Running class
+      workout = new Running([lat,lng], distance, duration,cadence)
+    }
+
+    //Add workout to array
+
+    this.#workouts.push(workout);
+    console.log(this.#workouts)
+
+
+
   }
 
 }
 
-const aman = new PersonCl('Aman Singh', 1996);
-console.log(aman)
-aman.calcAge()
-console.log(aman.age)
-
-console.log(aman.__proto__ === PersonCl.prototype)
-aman.greet()
+const app = new App();
